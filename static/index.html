@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Intelligence Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<div class="scanlines" aria-hidden="true"></div>
+<div class="ticker-wrap"><div class="ticker-track" id="ticker-track"></div></div>
+
+<div class="shell">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">SI<div class="brand-pulse"></div></div>
+            <div>
+                <div class="brand-name">StockIntel</div>
+                <div class="brand-live"><span class="live-dot"></span>NSE Dashboard</div>
+            </div>
+        </div>
+
+        <div class="sidebar-label">Companies</div>
+        <nav id="company-list"></nav>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-label">30-Day Movement</div>
+        <div id="gainers-losers"><div class="gl-loading">Loading market data...</div></div>
+    </aside>
+
+    <main class="centre">
+        <div class="topbar">
+            <div id="stock-title">
+                <span class="idle-hint">Select a company to begin<span class="blink">_</span></span>
+            </div>
+            <div class="tf-group" id="tf-group" style="opacity:0;pointer-events:none">
+                <button class="tf active" data-days="30">30D</button>
+                <button class="tf" data-days="90">90D</button>
+                <button class="tf" data-days="180">180D</button>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-idle" id="chart-idle">
+                <div class="idle-dots" aria-hidden="true"></div>
+                <div class="idle-msg">
+                    <div class="idle-icon">&#9783;</div>
+                    <p>Awaiting selection</p>
+                    <span>Pick a company to render its price chart</span>
+                </div>
+            </div>
+            <div id="chart-live" style="display:none;height:100%;display:flex;flex-direction:column;gap:12px">
+                <div class="chart-top-meta" id="chart-meta"></div>
+                <div style="flex:1;min-height:0"><canvas id="priceChart"></canvas></div>
+            </div>
+        </div>
+
+        <div class="stat-strip" id="stat-strip"></div>
+    </main>
+
+    <aside class="panel">
+        <div class="panel-idle" id="panel-idle">
+            <div class="panel-idle-icon">&#9783;</div>
+            <p>Select a stock to view its summary metrics.</p>
+        </div>
+        <div id="panel-content" style="display:none">
+
+            <div class="psec-label">52-Week Range</div>
+
+            <div class="mcard glow-green">
+                <div class="mcard-label">High</div>
+                <div class="mcard-val green" id="v-high">—</div>
+            </div>
+            <div class="mcard glow-red">
+                <div class="mcard-label">Low</div>
+                <div class="mcard-val red" id="v-low">—</div>
+            </div>
+
+            <div class="range-wrap">
+                <div class="range-track">
+                    <div class="range-fill" id="range-fill"></div>
+                    <div class="range-thumb" id="range-thumb"></div>
+                </div>
+                <div class="range-ends"><span>Low</span><span>Avg</span><span>High</span></div>
+            </div>
+
+            <div class="psec-label" style="margin-top:16px">Performance</div>
+
+            <div class="mcard">
+                <div class="mcard-label">Average Close</div>
+                <div class="mcard-val" id="v-avg">—</div>
+                <div class="mcard-sub">trailing 52 weeks</div>
+            </div>
+
+            <div class="mcard">
+                <div class="mcard-label">Volatility</div>
+                <div class="mcard-val" id="v-vol">—</div>
+                <div class="mcard-sub">annualised 30-day std dev</div>
+            </div>
+
+            <div class="psec-label" style="margin-top:16px">Momentum</div>
+
+            <div class="mcard">
+                <div class="mcard-label">RSI (14)</div>
+                <div class="rsi-row">
+                    <div class="mcard-val" id="v-rsi">—</div>
+                    <div class="rsi-badge" id="rsi-badge">—</div>
+                </div>
+                <div class="rsi-track"><div class="rsi-fill" id="rsi-fill"></div></div>
+                <div class="rsi-ticks"><span>0</span><span>30</span><span>70</span><span>100</span></div>
+            </div>
+
+            <div class="pred-card" id="pred-card" style="display:none">
+                <div class="pred-top">
+                    <span class="pred-lbl">Predicted Next Close</span>
+                    <span class="pred-tag">Linear Trend</span>
+                </div>
+                <div class="pred-val" id="v-pred">—</div>
+                <div class="pred-sub" id="pred-sub">—</div>
+            </div>
+
+            <button class="compare-btn" id="compare-btn">&#8644; Compare with another stock</button>
+        </div>
+    </aside>
+</div>
+
+<div class="modal-bg" id="modal-bg">
+    <div class="modal">
+        <div class="modal-top">
+            <span class="modal-title">Stock Comparison</span>
+            <button class="modal-x" id="modal-x">&#10005;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-vs-row">
+                <div class="modal-field">
+                    <label class="modal-lbl">Base</label>
+                    <div class="modal-static" id="modal-chip">—</div>
+                </div>
+                <div class="modal-vs-badge">VS</div>
+                <div class="modal-field">
+                    <label class="modal-lbl">Compare With</label>
+                    <input class="modal-input" id="compare-input" placeholder="e.g. TCS.NS" autocomplete="off"/>
+                </div>
+            </div>
+            <button class="modal-go" id="modal-go">Run Comparison</button>
+        </div>
+        <div id="compare-result"></div>
+    </div>
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
