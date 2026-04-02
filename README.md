@@ -68,7 +68,6 @@ A lightweight trend-based forecasting approach is implemented using linear regre
 * Data Processing: Pandas, NumPy
 * Frontend: HTML, CSS, JavaScript
 * Visualization: Chart.js
-* Deployment: Render (optional)
 * Containerization: Docker
 
 ---
@@ -76,7 +75,7 @@ A lightweight trend-based forecasting approach is implemented using linear regre
 ## Project Structure
 
 ```
-stock-dashboard/
+stock-intelligence-dashboard/
 ├── app/
 │   ├── main.py
 │   ├── models.py
@@ -101,7 +100,7 @@ stock-dashboard/
 
 ```
 git clone https://github.com/Ananyashakya/Stock-Data-Intelligence-DashBoard.
-cd stock-dashboard
+cd stock-intelligence-dashboard
 ```
 
 ### 2. Install dependencies
