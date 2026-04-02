@@ -138,6 +138,15 @@ http://127.0.0.1:8000/docs
 ```
 
 ---
+## Live Demo
+
+The application is deployed and accessible here:
+
+https://stock-data-intelligence-dashboard-8fqc.onrender.com
+
+Note: Initial load may take some time due to server cold start on the free hosting tier.
+
+---
 
 ## Key Highlights
 
